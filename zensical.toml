@@ -1,0 +1,35 @@
+[project]
+site_name = "sea nymph"
+site_description = "You know, like mermaids."
+site_author = "Excidion"
+copyright = "Copyright &copy; 2026 Excidion"
+docs_dir="docs"
+repo_url = "https://github.com/Excidion/seanymph"
+repo_name = "Excidion/seanymph"
+
+[project.theme]
+language = "en"
+features = [
+    "announce.dismiss",
+    "content.action.edit",
+    "content.action.view",
+    "content.code.annotate",
+    "content.code.copy",
+    "content.code.select",
+    "content.footnote.tooltips",
+    "content.tabs.link",
+    "content.tooltips",
+    "navigation.indexes",
+    "navigation.instant",
+    "navigation.instant.prefetch",
+    "navigation.path",
+    "navigation.sections",
+    "navigation.top",
+    "navigation.tracking",
+    "search.highlight",
+]
+
+[project.theme.icon]
+logo = "lucide/waves-arrow-down"
+repo = "fontawesome/brands/github"
+
