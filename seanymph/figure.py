@@ -26,6 +26,7 @@ class Figure:
     def __init__(self, title: str | None = None) -> None:
         self._title = title
         self._x_categories: list[str] | None = None
+        self._x_count: int | None = None  # length for numeric x, since no category list
         self._x_label: str | None = None
         self._x_min: float | None = None
         self._x_max: float | None = None
@@ -54,28 +55,45 @@ class Figure:
         return self
 
     def bar(self, x, y) -> Figure:
-        self._set_x_categories(x)
+        self._set_x_axis(x)
         return self._add_series("bar", y, horizontal=False)
 
     def line(self, x, y) -> Figure:
-        self._set_x_categories(x)
+        self._set_x_axis(x)
         return self._add_series("line", y, horizontal=False)
 
     def barh(self, x, y) -> Figure:
-        self._set_x_categories(x)
+        self._set_x_axis(x)
         return self._add_series("bar", y, horizontal=True)
 
     def lineh(self, x, y) -> Figure:
-        self._set_x_categories(x)
+        self._set_x_axis(x)
         return self._add_series("line", y, horizontal=True)
 
-    def _set_x_categories(self, x) -> None:
-        cats = [str(v) for v in x]
-        if self._x_categories is not None and cats != self._x_categories:
-            raise ValueError(
-                f"x values {cats} do not match existing x-axis categories {self._x_categories}"
-            )
-        self._x_categories = cats
+    def _set_x_axis(self, x) -> None:
+        x_list = list(x)
+        try:
+            x_floats = [float(v) for v in x_list]
+        except (TypeError, ValueError):
+            x_floats = None
+
+        if x_floats is not None:
+            x_min, x_max = min(x_floats), max(x_floats)
+            if self._x_min is not None and (self._x_min != x_min or self._x_max != x_max):
+                raise ValueError(
+                    f"x range [{x_min}, {x_max}] conflicts with existing x-axis range "
+                    f"[{self._x_min}, {self._x_max}]"
+                )
+            self._x_min = x_min
+            self._x_max = x_max
+            self._x_count = len(x_floats)
+        else:
+            cats = [str(v) for v in x_list]
+            if self._x_categories is not None and cats != self._x_categories:
+                raise ValueError(
+                    f"x values {cats} conflict with existing x-axis categories {self._x_categories}"
+                )
+            self._x_categories = cats
 
     def _add_series(self, series_type: str, data, horizontal: bool) -> Figure:
         if self._horizontal is not None and self._horizontal != horizontal:
@@ -96,10 +114,10 @@ class Figure:
             coerced.append(f)
         if not coerced:
             raise ValueError("data must not be empty")
-        if self._x_categories is not None and len(coerced) != len(self._x_categories):
+        x_len = len(self._x_categories) if self._x_categories is not None else self._x_count
+        if x_len is not None and len(coerced) != x_len:
             raise ValueError(
-                f"y length {len(coerced)} does not match "
-                f"x-axis category count {len(self._x_categories)}"
+                f"y length {len(coerced)} does not match x-axis length {x_len}"
             )
         if self._series and len(coerced) != len(self._series[0][1]):
             raise ValueError(
@@ -146,9 +164,10 @@ class Figure:
                 raise ValueError(
                     f"Series {i} ({stype}) has length {len(data)}, expected {expected}"
                 )
-        if self._x_categories is not None and len(self._x_categories) != expected:
+        x_len = len(self._x_categories) if self._x_categories is not None else self._x_count
+        if x_len is not None and x_len != expected:
             raise ValueError(
-                f"x-axis has {len(self._x_categories)} categories but series have {expected} values"
+                f"x-axis has {x_len} points but series have {expected} values"
             )
 
     def render(self) -> str:
