@@ -13,7 +13,7 @@ fig.line(months, [15, 35, 25, 45])
 fig.xlabel("Month")
 fig.ylabel("Revenue (k)")
 fig.ylim(0, 60)
-fig.title(title="Sales 2024")
+fig.title("Sales 2024")
 ```
 results in the following mermaid chart:
 ```mermaid
