@@ -33,7 +33,7 @@ class Figure:
         self._y_label: str | None = None
         self._y_min: float | None = None  # Mermaid y-axis range (user-set only)
         self._y_max: float | None = None
-        self._series: list[tuple[str, list[float]]] = []
+        self._series: list[tuple[str, list[float], str | None]] = []
         self._horizontal: bool | None = None
 
     def xlabel(self, label: str) -> Figure:
@@ -64,20 +64,20 @@ class Figure:
             self._y_min, self._y_max = float(min), float(max)
         return self
 
-    def bar(self, x, height) -> Figure:
+    def bar(self, x, height, color: str | None = None) -> Figure:
         self._set_x_axis(x)
-        return self._add_series("bar", height, horizontal=False)
+        return self._add_series("bar", height, horizontal=False, color=color)
 
-    def barh(self, y, width) -> Figure:
+    def barh(self, y, width, color: str | None = None) -> Figure:
         self._set_x_axis(y)
-        return self._add_series("bar", width, horizontal=True)
+        return self._add_series("bar", width, horizontal=True, color=color)
 
-    def line(self, x, y) -> Figure:
+    def line(self, x, y, color: str | None = None) -> Figure:
         if self._horizontal:
             self._set_x_axis(y)
-            return self._add_series("line", x, horizontal=None)
+            return self._add_series("line", x, horizontal=None, color=color)
         self._set_x_axis(x)
-        return self._add_series("line", y, horizontal=None)
+        return self._add_series("line", y, horizontal=None, color=color)
 
     def _set_x_axis(self, x) -> None:
         x_list = list(x)
@@ -104,7 +104,7 @@ class Figure:
                 )
             self._x_categories = cats
 
-    def _add_series(self, series_type: str, data, horizontal: bool | None) -> Figure:
+    def _add_series(self, series_type: str, data, horizontal: bool | None, color: str | None = None) -> Figure:
         if horizontal is not None:
             if self._horizontal is not None and self._horizontal != horizontal:
                 existing = "barh" if self._horizontal else "bar"
@@ -135,7 +135,7 @@ class Figure:
                 f"y length {len(coerced)} does not match "
                 f"existing series length {len(self._series[0][1])}"
             )
-        self._series.append((series_type, coerced))
+        self._series.append((series_type, coerced, color))
         return self
 
     def _render_x_axis(self) -> str | None:
@@ -169,7 +169,7 @@ class Figure:
         if not self._series:
             return
         expected = len(self._series[0][1])
-        for i, (stype, data) in enumerate(self._series):
+        for i, (stype, data, _) in enumerate(self._series):
             if len(data) != expected:
                 raise ValueError(
                     f"Series {i} ({stype}) has length {len(data)}, expected {expected}"
@@ -183,6 +183,13 @@ class Figure:
     def render(self) -> str:
         self._validate_series_consistency()
         lines: list[str] = []
+
+        colors = [color for _, _, color in self._series]
+        if any(c is not None for c in colors):
+            palette = ",".join(c or "#888888" for c in colors)
+            lines.append(
+                f"%%{{init: {{'themeVariables': {{'xyChart': {{'plotColorPalette': '{palette}'}}}}}}}}%%"
+            )
 
         header = "xychart-beta"
         if self._horizontal:
@@ -201,7 +208,7 @@ class Figure:
         if y_line:
             lines.append(y_line)
 
-        for series_type, data in self._series:
+        for series_type, data, _ in self._series:
             values = ", ".join(_format_number(v) for v in data)
             lines.append(f"    {series_type} [{values}]")
 

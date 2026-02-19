@@ -291,6 +291,60 @@ class TestNumberFormatting:
 
 
 # ---------------------------------------------------------------------------
+# Colors
+# ---------------------------------------------------------------------------
+
+class TestColors:
+    x = ["A", "B", "C"]
+
+    def test_no_color_no_init_block(self):
+        fig = Figure().bar(self.x, [1.0, 2.0, 3.0])
+        self._figures.append(fig)
+        out = fig.render()
+        assert "%%{init:" not in out
+
+    def test_single_series_color(self):
+        fig = Figure().bar(self.x, [1.0, 2.0, 3.0], color="#ff0000")
+        self._figures.append(fig)
+        out = fig.render()
+        assert "%%{init:" in out
+        assert "#ff0000" in out
+
+    def test_multiple_series_colors(self):
+        fig = (
+            Figure()
+            .bar(self.x, [1.0, 2.0, 3.0], color="#ff0000")
+            .line(self.x, [4.0, 5.0, 6.0], color="#00ff00")
+        )
+        self._figures.append(fig)
+        out = fig.render()
+        assert "#ff0000,#00ff00" in out
+
+    def test_partial_colors_use_fallback(self):
+        fig = (
+            Figure()
+            .bar(self.x, [1.0, 2.0, 3.0], color="#ff0000")
+            .line(self.x, [4.0, 5.0, 6.0])
+        )
+        self._figures.append(fig)
+        out = fig.render()
+        assert "#ff0000,#888888" in out
+
+    def test_color_on_barh(self):
+        fig = Figure().barh(self.x, [1.0, 2.0, 3.0], color="#0000ff")
+        self._figures.append(fig)
+        out = fig.render()
+        assert "#0000ff" in out
+        assert "xychart-beta horizontal" in out
+
+    def test_init_block_before_chart_header(self):
+        fig = Figure().bar(self.x, [1.0, 2.0, 3.0], color="#ff0000")
+        self._figures.append(fig)
+        out = fig.render()
+        assert out.index("%%{init:") < out.index("xychart-beta")
+
+
+# ---------------------------------------------------------------------------
 # Validation errors — no figures saved (all tests expect exceptions)
 # ---------------------------------------------------------------------------
 
