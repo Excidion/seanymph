@@ -1,5 +1,6 @@
 ```mermaid
 xychart-beta horizontal
-    x-axis "Group" [A, B, C]
+    x-axis [A, B, C]
+    y-axis "Value" 0 --> 5
     bar [1, 2, 3]
 ```

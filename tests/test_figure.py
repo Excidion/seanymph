@@ -91,30 +91,22 @@ class TestCategoricalHorizontal:
         assert "x-axis [A, B, C]" in out
         assert "bar [1, 2, 3]" in out
 
-    def test_lineh(self):
-        fig = Figure().lineh(self.x, self.y)
-        self._figures.append(fig)
-        out = fig.render()
-        assert out.startswith("xychart-beta horizontal")
-        assert "x-axis [A, B, C]" in out
-        assert "line [1, 2, 3]" in out
-
-    def test_barh_and_lineh(self):
-        fig = Figure().barh(self.x, self.y).lineh(self.x, [4.0, 5.0, 6.0])
+    def test_barh_and_line(self):
+        fig = Figure().barh(self.x, self.y).line([4.0, 5.0, 6.0], self.x)
         self._figures.append(fig)
         out = fig.render()
         assert "xychart-beta horizontal" in out
         assert "bar [1, 2, 3]" in out
         assert "line [4, 5, 6]" in out
 
-    def test_xlabel_with_barh(self):
-        fig = Figure().barh(self.x, self.y).xlabel("Group")
+    def test_ylabel_with_barh(self):
+        fig = Figure().barh(self.x, self.y).ylabel("Group")
         self._figures.append(fig)
         out = fig.render()
         assert 'x-axis "Group" [A, B, C]' in out
 
-    def test_ylabel_with_barh(self):
-        fig = Figure().barh(self.x, self.y).ylabel("Value").ylim(0, 5)
+    def test_xlabel_with_barh(self):
+        fig = Figure().barh(self.x, self.y).xlabel("Value").xlim(0, 5)
         self._figures.append(fig)
         out = fig.render()
         assert 'y-axis "Value" 0 --> 5' in out
@@ -192,16 +184,8 @@ class TestNumericHorizontal:
         assert "x-axis 10 --> 30" in out
         assert "bar [5, 15, 25]" in out
 
-    def test_lineh_numeric(self):
-        fig = Figure().lineh(self.x, self.y)
-        self._figures.append(fig)
-        out = fig.render()
-        assert out.startswith("xychart-beta horizontal")
-        assert "x-axis 10 --> 30" in out
-        assert "line [5, 15, 25]" in out
-
-    def test_barh_and_lineh_numeric(self):
-        fig = Figure().barh(self.x, self.y).lineh(self.x, [1.0, 2.0, 3.0])
+    def test_barh_and_line_numeric(self):
+        fig = Figure().barh(self.x, self.y).line([1.0, 2.0, 3.0], self.x)
         self._figures.append(fig)
         out = fig.render()
         assert "xychart-beta horizontal" in out
@@ -209,8 +193,8 @@ class TestNumericHorizontal:
         assert "bar [5, 15, 25]" in out
         assert "line [1, 2, 3]" in out
 
-    def test_xlabel_with_numeric_horizontal(self):
-        fig = Figure().barh(self.x, self.y).xlabel("Index")
+    def test_ylabel_with_numeric_horizontal(self):
+        fig = Figure().barh(self.x, self.y).ylabel("Index")
         self._figures.append(fig)
         out = fig.render()
         assert 'x-axis "Index" 10 --> 30' in out
@@ -269,9 +253,9 @@ class TestValidationErrors:
         with pytest.raises(ValueError, match="Cannot mix"):
             Figure().bar(["A", "B"], [1.0, 2.0]).barh(["A", "B"], [3.0, 4.0])
 
-    def test_mix_line_and_lineh(self):
+    def test_mix_bar_and_barh(self):
         with pytest.raises(ValueError, match="Cannot mix"):
-            Figure().line(["A", "B"], [1.0, 2.0]).lineh(["A", "B"], [3.0, 4.0])
+            Figure().bar(["A", "B"], [1.0, 2.0]).barh(["A", "B"], [3.0, 4.0])
 
     def test_non_numeric_y(self):
         with pytest.raises(TypeError, match="not numeric"):

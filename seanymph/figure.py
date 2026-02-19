@@ -28,47 +28,56 @@ class Figure:
         self._x_categories: list[str] | None = None
         self._x_count: int | None = None  # length for numeric x, since no category list
         self._x_label: str | None = None
-        self._x_min: float | None = None
+        self._x_min: float | None = None  # Mermaid x-axis range (auto-detected or user override)
         self._x_max: float | None = None
         self._y_label: str | None = None
-        self._y_min: float | None = None
+        self._y_min: float | None = None  # Mermaid y-axis range (user-set only)
         self._y_max: float | None = None
         self._series: list[tuple[str, list[float]]] = []
         self._horizontal: bool | None = None
 
     def xlabel(self, label: str) -> Figure:
-        self._x_label = label
+        if self._horizontal:
+            self._y_label = label
+        else:
+            self._x_label = label
         return self
 
     def ylabel(self, label: str) -> Figure:
-        self._y_label = label
+        if self._horizontal:
+            self._x_label = label
+        else:
+            self._y_label = label
         return self
 
     def xlim(self, min: float, max: float) -> Figure:
-        self._x_min = float(min)
-        self._x_max = float(max)
+        if self._horizontal:
+            self._y_min, self._y_max = float(min), float(max)
+        else:
+            self._x_min, self._x_max = float(min), float(max)
         return self
 
     def ylim(self, min: float, max: float) -> Figure:
-        self._y_min = float(min)
-        self._y_max = float(max)
+        if self._horizontal:
+            self._x_min, self._x_max = float(min), float(max)
+        else:
+            self._y_min, self._y_max = float(min), float(max)
         return self
 
-    def bar(self, x, y) -> Figure:
+    def bar(self, x, height) -> Figure:
         self._set_x_axis(x)
-        return self._add_series("bar", y, horizontal=False)
+        return self._add_series("bar", height, horizontal=False)
+
+    def barh(self, y, width) -> Figure:
+        self._set_x_axis(y)
+        return self._add_series("bar", width, horizontal=True)
 
     def line(self, x, y) -> Figure:
+        if self._horizontal:
+            self._set_x_axis(y)
+            return self._add_series("line", x, horizontal=None)
         self._set_x_axis(x)
-        return self._add_series("line", y, horizontal=False)
-
-    def barh(self, x, y) -> Figure:
-        self._set_x_axis(x)
-        return self._add_series("bar", y, horizontal=True)
-
-    def lineh(self, x, y) -> Figure:
-        self._set_x_axis(x)
-        return self._add_series("line", y, horizontal=True)
+        return self._add_series("line", y, horizontal=None)
 
     def _set_x_axis(self, x) -> None:
         x_list = list(x)
@@ -95,14 +104,16 @@ class Figure:
                 )
             self._x_categories = cats
 
-    def _add_series(self, series_type: str, data, horizontal: bool) -> Figure:
-        if self._horizontal is not None and self._horizontal != horizontal:
-            existing = "barh/lineh" if self._horizontal else "bar/line"
-            new = "barh/lineh" if horizontal else "bar/line"
-            raise ValueError(
-                f"Cannot mix {existing} (horizontal={self._horizontal}) "
-                f"with {new} (horizontal={horizontal})"
-            )
+    def _add_series(self, series_type: str, data, horizontal: bool | None) -> Figure:
+        if horizontal is not None:
+            if self._horizontal is not None and self._horizontal != horizontal:
+                existing = "barh" if self._horizontal else "bar"
+                new = "barh" if horizontal else "bar"
+                raise ValueError(
+                    f"Cannot mix {existing} (horizontal={self._horizontal}) "
+                    f"with {new} (horizontal={horizontal})"
+                )
+            self._horizontal = horizontal
         coerced: list[float] = []
         for i, v in enumerate(data):
             try:
@@ -124,7 +135,6 @@ class Figure:
                 f"y length {len(coerced)} does not match "
                 f"existing series length {len(self._series[0][1])}"
             )
-        self._horizontal = horizontal
         self._series.append((series_type, coerced))
         return self
 
