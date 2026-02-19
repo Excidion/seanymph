@@ -68,6 +68,12 @@ class TestCategoricalVertical:
         out = fig.render()
         assert 'title "My Chart"' in out
 
+    def test_title_method(self):
+        fig = Figure().bar(self.x, self.y).title("My Chart")
+        self._figures.append(fig)
+        out = fig.render()
+        assert 'title "My Chart"' in out
+
     def test_series_order_preserved(self):
         fig = Figure().bar(self.x, self.y).line(self.x, [4.0, 5.0, 6.0])
         self._figures.append(fig)

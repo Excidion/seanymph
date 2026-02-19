@@ -36,6 +36,10 @@ class Figure:
         self._series: list[tuple[str, list[float], str | None]] = []
         self._horizontal: bool | None = None
 
+    def title(self, title: str) -> Figure:
+        self._title = title
+        return self
+
     def xlabel(self, label: str) -> Figure:
         if self._horizontal:
             self._y_label = label
