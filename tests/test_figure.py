@@ -201,6 +201,72 @@ class TestNumericHorizontal:
 
 
 # ---------------------------------------------------------------------------
+# Multi-series
+# ---------------------------------------------------------------------------
+
+class TestMultiSeries:
+    x = ["Jan", "Feb", "Mar", "Apr"]
+
+    def test_two_lines(self):
+        fig = Figure().line(self.x, [1.0, 2.0, 3.0, 4.0]).line(self.x, [4.0, 3.0, 2.0, 1.0])
+        self._figures.append(fig)
+        out = fig.render()
+        assert out.count("line") == 2
+        assert "line [1, 2, 3, 4]" in out
+        assert "line [4, 3, 2, 1]" in out
+
+    def test_two_bars(self):
+        fig = Figure().bar(self.x, [10.0, 20.0, 30.0, 40.0]).bar(self.x, [5.0, 15.0, 25.0, 35.0])
+        self._figures.append(fig)
+        out = fig.render()
+        assert out.count("bar") == 2
+        assert "bar [10, 20, 30, 40]" in out
+        assert "bar [5, 15, 25, 35]" in out
+
+    def test_bar_and_two_lines(self):
+        fig = (
+            Figure()
+            .bar(self.x, [10.0, 20.0, 30.0, 40.0])
+            .line(self.x, [5.0, 15.0, 25.0, 35.0])
+            .line(self.x, [2.0, 4.0, 6.0, 8.0])
+        )
+        self._figures.append(fig)
+        out = fig.render()
+        assert "bar [10, 20, 30, 40]" in out
+        assert "line [5, 15, 25, 35]" in out
+        assert "line [2, 4, 6, 8]" in out
+        assert out.index("bar") < out.index("line")
+
+    def test_two_lines_horizontal(self):
+        fig = (
+            Figure()
+            .barh(self.x, [10.0, 20.0, 30.0, 40.0])
+            .line([5.0, 15.0, 25.0, 35.0], self.x)
+            .line([2.0, 4.0, 6.0, 8.0], self.x)
+        )
+        self._figures.append(fig)
+        out = fig.render()
+        assert "xychart-beta horizontal" in out
+        assert "bar [10, 20, 30, 40]" in out
+        assert "line [5, 15, 25, 35]" in out
+        assert "line [2, 4, 6, 8]" in out
+
+    def test_series_order_preserved_three(self):
+        fig = (
+            Figure()
+            .bar(self.x, [1.0, 2.0, 3.0, 4.0])
+            .line(self.x, [5.0, 6.0, 7.0, 8.0])
+            .line(self.x, [9.0, 10.0, 11.0, 12.0])
+        )
+        self._figures.append(fig)
+        out = fig.render()
+        bar_pos = out.index("bar [")
+        first_line = out.index("line [")
+        second_line = out.rindex("line [")
+        assert bar_pos < first_line < second_line
+
+
+# ---------------------------------------------------------------------------
 # Number formatting
 # ---------------------------------------------------------------------------
 
