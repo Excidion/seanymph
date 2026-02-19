@@ -20,7 +20,7 @@ def _format_number(n: float) -> str:
     return str(n)
 
 
-class Figure:
+class XYChart:
     """A Mermaid xyChart diagram builder with a matplotlib-style fluent API."""
 
     def __init__(self, title: str | None = None) -> None:
@@ -36,47 +36,47 @@ class Figure:
         self._series: list[tuple[str, list[float], str | None]] = []
         self._horizontal: bool | None = None
 
-    def title(self, title: str) -> Figure:
+    def title(self, title: str) -> XYChart:
         self._title = title
         return self
 
-    def xlabel(self, label: str) -> Figure:
+    def xlabel(self, label: str) -> XYChart:
         if self._horizontal:
             self._y_label = label
         else:
             self._x_label = label
         return self
 
-    def ylabel(self, label: str) -> Figure:
+    def ylabel(self, label: str) -> XYChart:
         if self._horizontal:
             self._x_label = label
         else:
             self._y_label = label
         return self
 
-    def xlim(self, min: float, max: float) -> Figure:
+    def xlim(self, min: float, max: float) -> XYChart:
         if self._horizontal:
             self._y_min, self._y_max = float(min), float(max)
         else:
             self._x_min, self._x_max = float(min), float(max)
         return self
 
-    def ylim(self, min: float, max: float) -> Figure:
+    def ylim(self, min: float, max: float) -> XYChart:
         if self._horizontal:
             self._x_min, self._x_max = float(min), float(max)
         else:
             self._y_min, self._y_max = float(min), float(max)
         return self
 
-    def bar(self, x, height, color: str | None = None) -> Figure:
+    def bar(self, x, height, color: str | None = None) -> XYChart:
         self._set_x_axis(x)
         return self._add_series("bar", height, horizontal=False, color=color)
 
-    def barh(self, y, width, color: str | None = None) -> Figure:
+    def barh(self, y, width, color: str | None = None) -> XYChart:
         self._set_x_axis(y)
         return self._add_series("bar", width, horizontal=True, color=color)
 
-    def line(self, x, y, color: str | None = None) -> Figure:
+    def line(self, x, y, color: str | None = None) -> XYChart:
         if self._horizontal:
             self._set_x_axis(y)
             return self._add_series("line", x, horizontal=None, color=color)
@@ -108,7 +108,7 @@ class Figure:
                 )
             self._x_categories = cats
 
-    def _add_series(self, series_type: str, data, horizontal: bool | None, color: str | None = None) -> Figure:
+    def _add_series(self, series_type: str, data, horizontal: bool | None, color: str | None = None) -> XYChart:
         if horizontal is not None:
             if self._horizontal is not None and self._horizontal != horizontal:
                 existing = "barh" if self._horizontal else "bar"

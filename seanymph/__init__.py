@@ -1,3 +1,3 @@
-from seanymph.figure import Figure
+from seanymph.xychart import XYChart
 
-__all__ = ["Figure"]
+__all__ = ["XYChart"]

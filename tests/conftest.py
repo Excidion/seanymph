@@ -1,8 +1,15 @@
+import shutil
 from pathlib import Path
 
 import pytest
 
 DOCS_TESTS_DIR = Path("docs/tests")
+
+
+@pytest.fixture(scope="session", autouse=True)
+def clean_docs_tests():
+    if DOCS_TESTS_DIR.exists():
+        shutil.rmtree(DOCS_TESTS_DIR)
 
 
 @pytest.fixture(autouse=True)
