@@ -1,5 +1,5 @@
 ```mermaid
 xychart-beta
     x-axis [A, B, C]
-    line [4, 6, 6]
+    line [2, 3, 3]
 ```

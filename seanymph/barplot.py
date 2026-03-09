@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import narwhals as nw
 
+from seanymph._utils import resolve_palette
 from seanymph.mermaidplotlib.xychart import XYChart
 
 
@@ -41,7 +42,7 @@ def barplot(
     # Stay lazy through the aggregation, collect once on the small result
     result = data.lazy().group_by(group_cols).agg(agg_expr).collect()
     levels = hue_order or (result[hue].unique(maintain_order=True).to_list() if hue else [None])
-    colors = _resolve_palette(palette, levels, color)
+    colors = resolve_palette(palette, levels, color)
 
     chart = XYChart()
     for level, c in zip(levels, colors):
@@ -53,9 +54,3 @@ def barplot(
     return chart
 
 
-def _resolve_palette(palette, levels, color) -> list:
-    if palette is None:
-        return [color] * len(levels)
-    if isinstance(palette, dict):
-        return [palette.get(level) for level in levels]
-    return list(palette)
