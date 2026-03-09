@@ -1,6 +1,6 @@
 import pytest
 
-from seanymph import XYChart
+from seanymph.mermaidplotlib import XYChart
 
 
 # ---------------------------------------------------------------------------

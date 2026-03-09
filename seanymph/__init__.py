@@ -1,3 +1,3 @@
-from seanymph.mermaidplotlib.xychart import XYChart
+from seanymph.barplot import barplot
 
-__all__ = ["XYChart"]
+__all__ = ["barplot"]
