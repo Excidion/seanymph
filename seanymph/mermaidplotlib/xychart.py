@@ -77,6 +77,21 @@ class XYChart:
         return self._add_series("bar", width, horizontal=True, color=color)
 
     def line(self, x, y, color: str | None = None) -> XYChart:
+        if not isinstance(x, list):
+            x = list(x)
+        try:
+            x_floats = [float(v) for v in x]
+        except (TypeError, ValueError):
+            pass
+        else:
+            if len(x_floats) > 1:
+                gaps = [x_floats[i + 1] - x_floats[i] for i in range(len(x_floats) - 1)]
+                if max(gaps) - min(gaps) > 1e-9 * abs(x_floats[-1] - x_floats[0]):
+                    raise ValueError(
+                        f"Numeric x values are not evenly spaced: {x_floats}. "
+                        "Mermaid xychart places points equidistantly, which would misrepresent the data."
+                    )
+
         if self._horizontal:
             self._set_x_axis(y)
             return self._add_series("line", x, horizontal=None, color=color)

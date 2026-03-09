@@ -104,3 +104,7 @@ class TestErrors:
     def test_missing_column(self):
         with pytest.raises(ValueError, match="Column 'z' not found"):
             lineplot(_df({"x": [1]}), x="z", y="x")
+
+    def test_uneven_numeric_x_raises(self):
+        with pytest.raises(ValueError, match="not evenly spaced"):
+            lineplot(_df({"x": [1.0, 2.0, 10.0], "y": [1.0, 2.0, 3.0]}), x="x", y="y")
