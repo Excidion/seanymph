@@ -14,10 +14,14 @@ def _format_category(label: str) -> str:
 
 
 def _format_number(n: float) -> str:
-    """Format a float cleanly, omitting .0 suffix for whole numbers."""
+    """Format a float cleanly without scientific notation, stripping trailing zeros."""
     if n == int(n):
         return str(int(n))
-    return str(n)
+    s = repr(n)
+    if "e" not in s:
+        return s
+    # Mermaid does not support scientific notation (e.g. 4.5e-07); convert to fixed
+    return f"{n:.15f}".rstrip("0").rstrip(".")
 
 
 class XYChart:
