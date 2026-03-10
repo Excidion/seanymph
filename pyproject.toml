@@ -4,9 +4,17 @@ version = "0.1.0"
 description = "A matplotlib-style Python library for generating Mermaid diagrams"
 readme = "README.md"
 requires-python = ">=3.13"
+authors = [
+    {name = "Excidion"},
+]
+license = "Apache-2.0"
 dependencies = [
     "narwhals>=2.17.0",
 ]
+
+[project.urls]
+Homepage = "https://excidion.github.io/sea-nymph"
+Repository = "https://github.com/Excidion/sea-nymph"
 
 [build-system]
 requires = ["uv_build>=0.6.0"]
