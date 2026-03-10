@@ -26,9 +26,24 @@ module-root = ""
 [tool.pytest.ini_options]
 pythonpath = ["."]
 
+[tool.interrogate]
+ignore-init-method = true
+ignore-private = true
+ignore-magic = true
+ignore-semiprivate = true
+ignore-module = true
+fail-under = 100
+generate-badge = "docs/img"
+
+[tool.pydoclint]
+style = "google"
+arg-type-hints-in-signature = true
+arg-type-hints-in-docstring = false
+
 [dependency-groups]
 docs = [
     "zensical>=0.0.23",
+    "mkdocstrings[python]>=0.27",
 ]
 dev = [
     "polars>=1.38.1",

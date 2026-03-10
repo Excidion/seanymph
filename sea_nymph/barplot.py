@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import narwhals as nw
+import narwhals.typing as nwt
 
 from sea_nymph._utils import resolve_palette
 from sea_nymph.mermaidplotlib.xychart import XYChart
@@ -8,7 +9,7 @@ from sea_nymph.mermaidplotlib.xychart import XYChart
 
 @nw.narwhalify
 def barplot(
-    data,
+    data: nwt.IntoFrame,
     *,
     x: str,
     y: str,
@@ -18,8 +19,32 @@ def barplot(
     estimator: nw.Expr | None = None,
     orient: str | None = None,
     color: str | None = None,
-    palette=None,
+    palette: list | None = None,
 ) -> XYChart:
+    """Plot a bar chart with optional aggregation.
+
+    Accepts any DataFrame supported by narwhals (pandas, polars, PyArrow, etc.).
+    Orientation is inferred from column types unless overridden with `orient`.
+
+    Args:
+        data: Input data. Any narwhals-compatible DataFrame or LazyFrame.
+        x: Column name for the x-axis.
+        y: Column name for the y-axis.
+        hue: Column name for grouping into separate series.
+        order: Explicit category order for the categorical axis.
+        hue_order: Explicit order for hue levels.
+        estimator: Aggregation expression (narwhals Expr). Defaults to mean.
+        orient: Force orientation — `"v"`/`"x"` for vertical, `"h"`/`"y"` for
+            horizontal. Inferred from column types when `None`.
+        color: Single colour for all bars (CSS colour string).
+        palette: List of colours, one per hue level.
+
+    Returns:
+        XYChart: An instance ready to render or further configure.
+
+    Raises:
+        ValueError: If a required column is missing or `orient` is invalid.
+    """
     if orient in ("h", "y"):
         horizontal = True
     elif orient in ("v", "x"):

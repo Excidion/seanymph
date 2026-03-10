@@ -4,7 +4,7 @@ site_description = "You know, like mermaids."
 site_author = "Excidion"
 copyright = "Copyright &copy; 2026 Excidion"
 docs_dir="docs"
-repo_url = "https://github.com/Excidion/sea_nymph"
+repo_url = "https://github.com/Excidion/sea-nymph"
 repo_name = "Excidion/sea-nymph"
 
 [project.theme]
@@ -32,4 +32,11 @@ features = [
 [project.theme.icon]
 logo = "lucide/waves-arrow-down"
 repo = "fontawesome/brands/github"
+
+[project.plugins.mkdocstrings.handlers.python]
+paths = ["."]
+
+[project.plugins.mkdocstrings.handlers.python.options]
+docstring_style = "google"
+show_source = false
 

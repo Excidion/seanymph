@@ -10,6 +10,18 @@ repos:
     hooks:
       - id: uv-lock
 
+  - repo: https://github.com/econchick/interrogate
+    rev: 1.7.0
+    hooks:
+      - id: interrogate
+        args: [sea_nymph]
+        pass_filenames: false
+
+  - repo: https://github.com/jsh9/pydoclint
+    rev: 0.8.3
+    hooks:
+      - id: pydoclint
+
   - repo: local
     hooks:
       - id: pytest

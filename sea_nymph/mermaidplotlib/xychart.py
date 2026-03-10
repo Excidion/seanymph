@@ -39,10 +39,12 @@ class XYChart:
         self._horizontal: bool | None = None
 
     def title(self, title: str) -> XYChart:
+        """Set the chart title."""
         self._title = title
         return self
 
     def xlabel(self, label: str) -> XYChart:
+        """Set the x-axis label (respects horizontal orientation)."""
         if self._horizontal:
             self._y_label = label
         else:
@@ -50,6 +52,7 @@ class XYChart:
         return self
 
     def ylabel(self, label: str) -> XYChart:
+        """Set the y-axis label (respects horizontal orientation)."""
         if self._horizontal:
             self._x_label = label
         else:
@@ -57,6 +60,7 @@ class XYChart:
         return self
 
     def xlim(self, min: float, max: float) -> XYChart:
+        """Set the x-axis range (respects horizontal orientation)."""
         if self._horizontal:
             self._y_min, self._y_max = float(min), float(max)
         else:
@@ -64,6 +68,7 @@ class XYChart:
         return self
 
     def ylim(self, min: float, max: float) -> XYChart:
+        """Set the y-axis range (respects horizontal orientation)."""
         if self._horizontal:
             self._x_min, self._x_max = float(min), float(max)
         else:
@@ -71,10 +76,12 @@ class XYChart:
         return self
 
     def bar(self, x, height, color: str | None = None) -> XYChart:
+        """Add a vertical bar series."""
         self._set_x_axis(x)
         return self._add_series("bar", height, horizontal=False, color=color)
 
     def barh(self, y, width, color: str | None = None) -> XYChart:
+        """Add a horizontal bar series."""
         self._set_x_axis(y)
         return self._add_series("bar", width, horizontal=True, color=color)
 
@@ -93,6 +100,7 @@ class XYChart:
                 )
 
     def line(self, x, y, color: str | None = None) -> XYChart:
+        """Add a line series. Numeric x values must be evenly spaced."""
         if not isinstance(x, list):
             x = list(x)
         self._check_evenly_spaced(x)
@@ -103,6 +111,7 @@ class XYChart:
         return self._add_series("line", y, horizontal=None, color=color)
 
     def lineh(self, y, x, color: str | None = None) -> XYChart:
+        """Add a horizontal line series. Numeric y values must be evenly spaced."""
         if not isinstance(y, list):
             y = list(y)
         self._check_evenly_spaced(y)
@@ -223,6 +232,7 @@ class XYChart:
             )
 
     def render(self) -> str:
+        """Render the chart as a Mermaid diagram string."""
         self._validate_series_consistency()
         lines: list[str] = []
 
@@ -260,4 +270,5 @@ class XYChart:
         return f"```mermaid\n{self.render()}\n```"
 
     def save(self, path: str | Path) -> None:
+        """Save the chart as a Markdown fenced code block to a file."""
         Path(path).write_text(str(self) + "\n", encoding="utf-8")

@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 
 import narwhals as nw
+import narwhals.typing as nwt
 
 from sea_nymph._utils import resolve_palette
 from sea_nymph.mermaidplotlib.xychart import XYChart
@@ -27,7 +28,7 @@ def _gaussian_kde(data, col: str, grid: list[float], bandwidth: float) -> list[f
 
 @nw.narwhalify
 def kdeplot(
-    data,
+    data: nwt.IntoFrame,
     *,
     x: str | None = None,
     y: str | None = None,
@@ -37,8 +38,33 @@ def kdeplot(
     cut: float = 3.0,
     gridsize: int = 200,
     color: str | None = None,
-    palette=None,
+    palette: list | None = None,
 ) -> XYChart:
+    """Plot a kernel density estimate using Silverman's rule.
+
+    Uses a Gaussian kernel with bandwidth selected via Silverman's rule of thumb,
+    scaled by `bw_adjust`. The evaluation grid is always evenly spaced, satisfying
+    Mermaid's equidistant constraint.
+
+    Args:
+        data: Input data. Any narwhals-compatible DataFrame or LazyFrame.
+        x: Column name for horizontal density (mutually exclusive with `y`).
+        y: Column name for vertical density (mutually exclusive with `x`).
+        hue: Column name for grouping into separate series.
+        hue_order: Explicit order for hue levels.
+        bw_adjust: Multiplicative factor applied to the Silverman bandwidth.
+            Values > 1 produce smoother curves.
+        cut: Number of bandwidths to extend the grid beyond the data range.
+        gridsize: Number of evaluation points on the density grid.
+        color: Single colour for the line (CSS colour string).
+        palette: List of colours, one per hue level.
+
+    Returns:
+        XYChart: An instance ready to render or further configure.
+
+    Raises:
+        ValueError: If neither or both of `x`/`y` are provided, or `gridsize < 2`.
+    """
     if (x is None) == (y is None):
         raise ValueError("exactly one of x or y must be provided")
     if gridsize < 2:

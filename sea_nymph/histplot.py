@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import narwhals as nw
+import narwhals.typing as nwt
 
 from sea_nymph._utils import resolve_palette
 from sea_nymph.mermaidplotlib.xychart import XYChart
@@ -45,7 +46,7 @@ def _fmt(v: float) -> str:
 
 @nw.narwhalify
 def histplot(
-    data,
+    data: nwt.IntoFrame,
     *,
     x: str | None = None,
     y: str | None = None,
@@ -57,8 +58,35 @@ def histplot(
     binrange: tuple | None = None,
     discrete: bool = False,
     color: str | None = None,
-    palette=None,
+    palette: list | None = None,
 ) -> XYChart:
+    """Plot a histogram of a numeric variable.
+
+    Bins must be equal-width — Mermaid places bars equidistantly, so unequal bin
+    widths would misrepresent the data and are rejected.
+
+    Args:
+        data: Input data. Any narwhals-compatible DataFrame or LazyFrame.
+        x: Column name for horizontal distribution (mutually exclusive with `y`).
+        y: Column name for vertical distribution (mutually exclusive with `x`).
+        hue: Column name for grouping into separate series.
+        hue_order: Explicit order for hue levels.
+        stat: Statistic to plot. One of `"count"`, `"frequency"`, `"probability"`,
+            `"proportion"`, `"percent"`, `"density"`.
+        bins: Number of equal-width bins, or an explicit list of bin edges.
+        binwidth: Width of each bin. Overrides `bins` if provided.
+        binrange: `(min, max)` tuple clamping the data range.
+        discrete: If `True`, treat each unique integer value as its own bin.
+        color: Single colour for all bars (CSS colour string).
+        palette: List of colours, one per hue level.
+
+    Returns:
+        XYChart: An instance ready to render or further configure.
+
+    Raises:
+        ValueError: If neither or both of `x`/`y` are provided, if `stat` is
+            invalid, or if explicit bin edges are not equally spaced.
+    """
     if (x is None) == (y is None):
         raise ValueError("exactly one of x or y must be provided")
     if stat not in _VALID_STATS:

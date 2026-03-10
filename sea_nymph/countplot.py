@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import narwhals as nw
+import narwhals.typing as nwt
 
 from sea_nymph.barplot import barplot
 from sea_nymph.mermaidplotlib.xychart import XYChart
@@ -8,7 +9,7 @@ from sea_nymph.mermaidplotlib.xychart import XYChart
 
 @nw.narwhalify
 def countplot(
-    data,
+    data: nwt.IntoFrame,
     *,
     x: str | None = None,
     y: str | None = None,
@@ -17,8 +18,28 @@ def countplot(
     hue_order: list | None = None,
     stat: str = "count",
     color: str | None = None,
-    palette=None,
+    palette: list | None = None,
 ) -> XYChart:
+    """Plot counts (or proportions) of a categorical variable.
+
+    Args:
+        data: Input data. Any narwhals-compatible DataFrame or LazyFrame.
+        x: Column name for horizontal categories (mutually exclusive with `y`).
+        y: Column name for vertical categories (mutually exclusive with `x`).
+        hue: Column name for grouping into separate series.
+        order: Explicit category order.
+        hue_order: Explicit order for hue levels.
+        stat: Statistic to compute. One of `"count"`, `"percent"`,
+            `"proportion"`, `"probability"`.
+        color: Single colour for all bars (CSS colour string).
+        palette: List of colours, one per hue level.
+
+    Returns:
+        XYChart: An instance ready to render or further configure.
+
+    Raises:
+        ValueError: If neither or both of `x`/`y` are provided, or `stat` is invalid.
+    """
     if (x is None) == (y is None):
         raise ValueError("exactly one of x or y must be provided")
     if stat not in ("count", "percent", "proportion", "probability"):
