@@ -15,8 +15,13 @@ def _module_path(fspath: Path) -> Path:
 
 @pytest.fixture(scope="session", autouse=True)
 def clean_docs_tests():
+    index = DOCS_TESTS_DIR / "index.md"
+    saved = index.read_text(encoding="utf-8") if index.exists() else None
     if DOCS_TESTS_DIR.exists():
         shutil.rmtree(DOCS_TESTS_DIR)
+    DOCS_TESTS_DIR.mkdir(parents=True, exist_ok=True)
+    if saved is not None:
+        index.write_text(saved, encoding="utf-8")
 
 
 @pytest.fixture(autouse=True)
